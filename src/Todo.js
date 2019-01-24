@@ -15,39 +15,45 @@ class Todo extends React.Component {
 
   taskList() {
     return this.state.todos
-      .filter( task => task.text.search(this.state.filter) !== -1 )
+      .filter(task => task.text.search(this.state.filter) !== -1)
       .map(task => {
-      if (task.done) {
-        return (
-          <li key={task.id}>
-            <input type="checkbox" defaultChecked="true"/>
-            <s>{task.text}</s>
-          </li>
-        );
-      } else {
-        return ( 
-          <li key={task.id}>
-            <input type="checkbox" onChange={this.doneClick(task.id)}/>
-            {task.text}
-          </li>
-        );
-      }
-    });
+        if (task.done) {
+          return (
+            <li key={task.id}>
+              <input type="checkbox" defaultChecked="true" onChange={this.undoneClick(task.id)} />
+              <s>{task.text}</s>
+            </li>
+          );
+        } else {
+          return (
+            <li key={task.id}>
+              <input type="checkbox" onChange={this.doneClick(task.id)} />
+              {task.text}
+            </li>
+          );
+        }
+      });
   }
 
+  doneClick = taskId => {
+    return () => {
+      const task = this.state.todos.filter(task => task.id === taskId)[0];
+      const updatedTask = { ...task, done: true };
+      this.setState({
+        todos: [...this.state.todos.map(task => task.id !== taskId ? task : { ...updatedTask })]
+      })
+    }
+  }
 
-  // doneClick = taskId => {
-  //   // const task = this.state.todos.filter( task => task.id === taskId )[0];
-  //   // console.log(task);
-  //   // const updatedTask = {...task, done: true};
-  //   // this.setState({
-  //   //   todos: [...this.state.todos, {...updatedTask} ]
-  //   // })
-  // }
-
-  // undoneClick = event => {
-
-  // }
+  undoneClick = taskId => {
+    return () => {
+      const task = this.state.todos.filter(task => task.id === taskId)[0];
+      const updatedTask = { ...task, done: false };
+      this.setState({
+        todos: [...this.state.todos.map(task => task.id !== taskId ? task : { ...updatedTask })]
+      })
+    }
+  }
 
 
   remaining() {
@@ -64,7 +70,7 @@ class Todo extends React.Component {
       done: false
     };
     this.setState({
-      todos: [...this.state.todos, {...newTask}],
+      todos: [...this.state.todos, { ...newTask }],
       text: '',
       filter: this.state.filter
     });
@@ -99,8 +105,8 @@ class Todo extends React.Component {
       <div className="Todo">
         <h2>Todo</h2>
         <div>
-          <input type="text" placeholder="filter tasks" 
-          onChange={this.onChangeFilter}/>
+          <input type="text" placeholder="filter tasks"
+            onChange={this.onChangeFilter} />
           <br />
           <span> {this.remaining()} remaining </span>
         </div>
